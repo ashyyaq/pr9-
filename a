@@ -1,0 +1,71 @@
+#include <iostream>
+#include <vector>
+#include <thread>
+
+class MergeSort {
+public:
+    void Sort(std::vector<int>& nums) {
+        if (nums.size() <= 1) {
+            return;
+        }
+        int mid = nums.size() / 2;
+        std::vector<int> left(nums.begin(), nums.begin() + mid);
+        std::vector<int> right(nums.begin() + mid, nums.end());
+
+        Sort(left);
+        Sort(right);
+        Merge(nums, left, right);
+    }
+
+    void Merge(std::vector<int>& nums, const std::vector<int>& left, const std::vector<int>& right) {
+        int i = 0, j = 0, k = 0;
+        while (i < left.size() && j < right.size()) {
+            if (left[i] < right[j]) {
+                nums[k] = left[i];
+                i++;
+            }
+            else {
+                nums[k] = right[j];
+                j++;
+            }
+            k++;
+        }
+        while (i < left.size()) {
+            nums[k] = left[i];
+            i++;
+            k++;
+        }
+        while (j < right.size()) {
+            nums[k] = right[j];
+            j++;
+            k++;
+        }
+    }
+};
+
+int main() {
+    setlocale(LC_ALL, "");
+    std::vector<int> nums(10);
+    std::cout << "Введите 10 чисел:\n";
+    for (int i = 0; i < 10; ++i) {
+        std::cin >> nums[i];
+    }
+
+    MergeSort mergeSort;
+
+    auto sortFunc = [&mergeSort, &nums]() {
+        mergeSort.Sort(nums);
+        };
+
+    std::thread mergeSortThread(sortFunc);
+
+    mergeSortThread.join();
+
+    std::cout << "Отсортированные числа (от меньшего к большему):\n";
+    for (int num : nums) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
